@@ -1,6 +1,6 @@
 body {
-	background-color: #ffffff;
-	color: #000000;
+	background-color: #FFE436;
+	color: #8B6C42;
 }
 body {
   margin: 0;
@@ -32,6 +32,6 @@ body {
   max-width: 1000px;
   z-index: 2;
   position: relative;
-  background-color: ;
+  background-color: #FFFFFF;
   padding: 20px;
 }
