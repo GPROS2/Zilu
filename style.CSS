@@ -35,3 +35,18 @@ body {
   background-color: ;
   padding: 20px;
 }
+@media only screen and (max-width: 768px) {
+  .bande-gauche,
+  .bande-droite {
+    display: none; /* On cache les bandes sur petit écran */
+  }
+
+  .contenu {
+    width: 90%;
+    padding: 10px;
+  }
+
+  body {
+    background-color: #f0f0f0; /* Tu peux changer le fond aussi */
+  }
+}
