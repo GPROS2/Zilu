@@ -1,6 +1,6 @@
 body {
-	background-color: #FFE436;
-	color: #8B6C42;
+	background-color: #ffffff;
+	color: #000000;
 }
 body {
   margin: 0;
@@ -32,7 +32,7 @@ body {
   max-width: 1000px;
   z-index: 2;
   position: relative;
-  background-color: #FFFFFF;
+  background-color: ;
   padding: 20px;
 }
 @media only screen and (max-width: 768px) {
@@ -47,21 +47,7 @@ body {
   }
 
   body {
-    background-color: #8B6C42;
-	color: #E8D630;
+    background-color: #F0E36B;
+	color: #E67E30;
   }
-}
-button {
-  padding: 10px 20px;
-  background-color: #3366cc;
-  color: white;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 1em;
-  transition: background-color 0.3s ease;
-}
-
-button:hover {
-  background-color: #FFE436;
 }
