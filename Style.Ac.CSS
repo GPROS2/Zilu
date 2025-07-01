@@ -9,6 +9,10 @@ body {
   justify-content: center;
 }
 
+
+
+
+
 .bande-gauche,
 .bande-droite {
   width: 60px;
@@ -35,6 +39,10 @@ body {
   background-color: #FFFFFF;
   padding: 20px;
 }
+
+
+
+
 @media only screen and (max-width: 768px) {
   .bande-gauche,
   .bande-droite {
@@ -51,6 +59,10 @@ body {
 	color: #E8D630;
   }
 }
+
+
+
+
 button {
   padding: 10px 20px;
   background-color: #3366cc;
@@ -64,4 +76,29 @@ button {
 
 button:hover {
   background-color: #FFE436;
+}
+
+
+
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 20px 0;
+  background-color: #FFE436;
+}
+
+th, td {
+  border: 1px solid #8B6C42;
+  padding: 12px;
+  text-align: left;
+}
+
+thead {
+  background-color: #3366cc;
+  color: white;
+}
+
+tr:hover {
+  background-color: #f0f0f0;
 }
