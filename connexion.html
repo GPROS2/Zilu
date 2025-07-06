@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Zilu</title>
+	<link rel="stylesheet" href="style-connexion.CSS">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+</head>
+<script type="module">
+  // 👉 1. IMPORT DES MODULES FIREBASE
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+
+  // 👉 2. CONFIGURATION FIREBASE (au début)
+  const firebaseConfig = {
+	apiKey: "AIzaSyDS31w_jJbABou5_0M-CIXb8lwSDz6v9kk",
+	authDomain: "insription-zilu.firebaseapp.com",
+	projectId: "insription-zilu",
+	storageBucket: "insription-zilu.appspot.com",
+	messagingSenderId: "779556803914",
+	appId: "1:779556803914:web:94bb1e09576cad20f11db3",
+	measurementId: "G-9YV1TK4QJW"
+  };
+
+  // 👉 3. INITIALISATION FIREBASE
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  // 👉 4. TON CODE D’INSCRIPTION / CONNEXION ICI (après l’init)
+  document.getElementById("inscription").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const email = document.getElementById("email").value;
+    const mdp = document.getElementById("motdepasse").value;
+
+    createUserWithEmailAndPassword(auth, email, mdp)
+      .then((userCredential) => {
+        alert("Compte créé avec succès !");
+      })
+      .catch((error) => {
+        alert("Erreur : " + error.message);
+      });
+  });
+
+  // Connexion idem ici ↓
+</script>
+
+<body>
+	<div class="bande-gauche"></div>
+	<div class="bande-droite"></div>
+	<div class="contenu">
+	<form id="connexion">
+  <h2>Connexion</h2>
+
+  <label for="email-connexion">Email :</label>
+  <input type="email" id="email-connexion" name="email" required>
+
+  <label for="mdp-connexion">Mot de passe :</label>
+  <input type="password" id="mdp-connexion" name="motdepasse" required>
+
+  <button type="submit">Se connecter</button>
+</form>
+
+	
+	
+	
+	
+	
+	</div>
+</body>
+</html>
