@@ -1,53 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Zilu-inscription</title>
-	<link rel="stylesheet" href="style-connexion.CSS">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+    <title>Zilu-inscription</title>
+    <link rel="stylesheet" href="style-connexion.css"> <!-- nom corrigé -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- 👉 SDK Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
+
 <script type="module">
-  // 👉 1. IMPORT DES MODULES FIREBASE
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+  // 👉 1. INIT SUPABASE
+  const supabaseUrl = 'https://cidcezkgwrtgevjcvkao.supabase.co'; // Remplace avec ton URL
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ'; // à retrouver dans Supabase > Project Settings > API
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // 👉 2. CONFIGURATION FIREBASE (au début)
-  const firebaseConfig = {
-	apiKey: "AIzaSyDS31w_jJbABou5_0M-CIXb8lwSDz6v9kk",
-	authDomain: "insription-zilu.firebaseapp.com",
-	projectId: "insription-zilu",
-	storageBucket: "insription-zilu.appspot.com",
-	messagingSenderId: "779556803914",
-	appId: "1:779556803914:web:94bb1e09576cad20f11db3",
-	measurementId: "G-9YV1TK4QJW"
-  };
-
-  // 👉 3. INITIALISATION FIREBASE
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-
-  // 👉 4. TON CODE D’INSCRIPTION / CONNEXION ICI (après l’init)
-  document.getElementById("inscription").addEventListener("submit", (e) => {
+  // 👉 2. FORMULAIRE D’INSCRIPTION
+  document.getElementById("inscription").addEventListener("submit", async (e) => {
     e.preventDefault();
     const email = document.getElementById("email").value;
     const mdp = document.getElementById("motdepasse").value;
 
-    createUserWithEmailAndPassword(auth, email, mdp)
-      .then((userCredential) => {
-        alert("Compte créé avec succès !");
-      })
-      .catch((error) => {
-        alert("Erreur : " + error.message);
-      });
-  });
+    // 🚀 Inscription avec Supabase Auth
+    const { data, error } = await supabase.auth.signUp({
+      email: email,
+      password: mdp
+    });
 
-  // Connexion idem ici ↓
+    if (error) {
+      alert("Erreur : " + error.message);
+    } else {
+      alert("Compte créé avec succès ! Vérifie tes emails 📩");
+    }
+  });
 </script>
+
 <body>
-	<div class="bande-gauche"></div>
-	<div class="bande-droite"></div>
-	<div class="contenu">
-	<form id="inscription">
+    <div class="bande-gauche"></div>
+    <div class="bande-droite"></div>
+    <div class="contenu">
+    <form id="inscription">
     <h2>Créer un compte Zilu</h2>
 
     <label for="pseudo">Pseudo :</label>
@@ -60,13 +51,7 @@
     <input type="password" id="motdepasse" name="motdepasse" required>
 
     <button type="submit">S'inscrire</button>
-</form>
-
-	
-	
-	
-	
-	
-	</div>
+    </form>
+    </div>
 </body>
 </html>

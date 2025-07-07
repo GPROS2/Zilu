@@ -5,6 +5,8 @@
   <title>Zilu – Dashboard</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style-dashboard.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+
   <style>
     body {
       font-family: sans-serif;
@@ -71,8 +73,9 @@
 <body>
 
   <div class="stockage-container">
+    <div id="profil">Chargement...</div>
     <h2>Tableau de bord Zilu</h2>
-    <p>Stockage utilisé : <span id="utilisation">0</span> / 300 Mo</p>
+    <p>Stockage utilisé : <span id="utilisation">0</span> / 100 Mo</p>
     <div class="barre-externe">
       <div id="barre-interne"></div>
     </div>
@@ -82,34 +85,41 @@
   <div class="import-zone">
     <input type="file" id="upload-file" />
     <br>
-    <button id="envoyer-fichier">Importer vers Firebase</button>
+    <button id="envoyer-fichier">Importer vers Zilu Cloud</button>
     <p id="upload-status"></p>
+	<div id="profil">Connecté en tant que : ...</div>
+	<button id="logout">Déconnexion</button>
+
   </div>
 
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-    import { getStorage, ref, listAll, getMetadata, uploadBytes } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+    const supabase = supabase.createClient(
+      "https://cidcezkgwrtgevjcvkao.supabase.co", // ✅ Ton URL
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ"
+    );
 
-    // 🔑 Config Firebase
-    const firebaseConfig = {
-      apiKey: "AIzaSyDS31w_jJbABou5_0M-CIXb8lwSDz6v9kk",
-      authDomain: "insription-zilu.firebaseapp.com",
-      projectId: "insription-zilu",
-      storageBucket: "insription-zilu.appspot.com",
-      messagingSenderId: "779556803914",
-      appId: "1:779556803914:web:94bb1e09576cad20f11db3",
-      measurementId: "G-9YV1TK4QJW"
+    const profil = document.getElementById("profil");
+    const statut = document.getElementById("upload-status");
+    const totalMo = 100;
+
+    let userId = null;
+
+    // 🔐 Récupérer l'utilisateur connecté
+    const afficherProfil = async () => {
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      if (error || !user) {
+        profil.innerText = "Aucun utilisateur connecté";
+        window.location.href = "connexion.html";
+      } else {
+        profil.innerText = `Connecté en tant que : ${user.email}`;
+        userId = user.id;
+        calculerStockage();
+      }
     };
-
-    // 🚀 Init
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const storage = getStorage(app);
 
     // 📊 Barre de stockage
     function updateBarre(tailleMo) {
-      const totalMo = 300;
       const utilisation = document.getElementById("utilisation");
       const barre = document.getElementById("barre-interne");
       const alerte = document.getElementById("alerte");
@@ -131,59 +141,55 @@
       }
     }
 
-    // 🧮 Calcul du stockage
-    function calculerStockage(uid) {
-      const dossier = ref(storage, `fichiers/${uid}`);
-      listAll(dossier).then((res) => {
-        let tailleTotale = 0;
-        const promesses = res.items.map((item) =>
-          getMetadata(item).then((meta) => {
-            tailleTotale += meta.size / (1024 * 1024); // octets → Mo
-          })
-        );
-        Promise.all(promesses).then(() => {
-          updateBarre(tailleTotale);
-        });
-      }).catch((err) => {
-        console.error("Erreur lecture dossier Firebase :", err);
+    // 🧮 Calcul du stockage Supabase
+    async function calculerStockage() {
+      const { data, error } = await supabase.storage.from('fichiers').list(userId, {
+        limit: 100,
+        offset: 0
       });
+
+      if (error) {
+        console.error("Erreur lecture bucket Supabase :", error);
+        return;
+      }
+
+      let tailleTotale = 0;
+      for (let fichier of data) {
+        tailleTotale += fichier.metadata.size / (1024 * 1024); // octets → Mo
+      }
+      updateBarre(tailleTotale);
     }
 
     // 📁 Import de fichier
     const boutonUpload = document.getElementById("envoyer-fichier");
     const inputFichier = document.getElementById("upload-file");
-    const statut = document.getElementById("upload-status");
 
-    let utilisateurConnecté = null;
-
-    boutonUpload.addEventListener("click", () => {
+    boutonUpload.addEventListener("click", async () => {
       const fichier = inputFichier.files[0];
-      const user = utilisateurConnecté;
 
-      if (fichier && user) {
-        const chemin = `fichiers/${user.uid}/${fichier.name}`;
-        const refFichier = ref(storage, chemin);
+      if (!fichier || !userId) {
+        statut.textContent = "⚠️ Aucun fichier ou utilisateur non connecté.";
+        return;
+      }
 
-        uploadBytes(refFichier, fichier).then(() => {
-          statut.textContent = `✅ Fichier "${fichier.name}" importé !`;
-          calculerStockage(user.uid); // 🔄 Mise à jour après upload
-        }).catch((error) => {
-          statut.textContent = `❌ Erreur d'upload : ${error.message}`;
-        });
+      const chemin = `${userId}/${fichier.name}`;
+      const { error } = await supabase.storage.from('fichiers').upload(chemin, fichier);
+
+      if (error) {
+        statut.textContent = `❌ Erreur d'upload : ${error.message}`;
       } else {
-        statut.textContent = "⚠️ Aucun fichier sélectionné ou utilisateur non connecté.";
+        statut.textContent = `✅ Fichier "${fichier.name}" importé !`;
+        calculerStockage(); // 🔄 Mise à jour
       }
     });
 
-    // 🔐 Auth utilisateur
-    onAuthStateChanged(auth, (user) => {
-      if (user) {
-        utilisateurConnecté = user;
-        calculerStockage(user.uid);
-      } else {
-        window.location.href = "connexion.html";
-      }
-    });
+    afficherProfil();
+	
+	document.getElementById("logout").addEventListener("click", async () => {
+		await supabase.auth.signOut();
+		window.location.href = "connexion.html";
+	});
+
   </script>
 </body>
 </html>

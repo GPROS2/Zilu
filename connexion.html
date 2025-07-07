@@ -1,78 +1,56 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Zilu</title>
-	<link rel="stylesheet" href="style-connexion.CSS">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+  <title>Zilu – Connexion</title>
+  <link rel="stylesheet" href="style-connexion.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- 👉 SDK Supabase -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
+
 <script type="module">
-  // 👉 1. IMPORT DES MODULES FIREBASE
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+  // 👉 1. INIT Supabase
+  const supabaseUrl = 'https://cidcezkgwrtgevjcvkao.supabase.co'; // ✅ ton URL
+  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ';
+  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-  // 👉 2. CONFIGURATION FIREBASE (au début)
-  const firebaseConfig = {
-	apiKey: "AIzaSyDS31w_jJbABou5_0M-CIXb8lwSDz6v9kk",
-	authDomain: "insription-zilu.firebaseapp.com",
-	projectId: "insription-zilu",
-	storageBucket: "insription-zilu.appspot.com",
-	messagingSenderId: "779556803914",
-	appId: "1:779556803914:web:94bb1e09576cad20f11db3",
-	measurementId: "G-9YV1TK4QJW"
-  };
+  // 👉 2. Connexion utilisateur
+  document.getElementById("connexion").addEventListener("submit", async (e) => {
+    e.preventDefault();
 
-  // 👉 3. INITIALISATION FIREBASE
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
-  
-  window.addEventListener("DOMContentLoaded", () => {
-  const form = document.getElementById("connexion");
-  if (form) {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const email = document.getElementById("email-connexion").value;
-      const mdp = document.getElementById("mdp-connexion").value;
+    const email = document.getElementById("email").value;
+    const mdp = document.getElementById("motdepasse").value;
 
-     signInWithEmailAndPassword(auth, email, mdp)
-		.then((userCredential) => {
-			alert("Connexion réussie !");
-			console.log("Redirection vers dashboard.html...");
-			window.location.href = "dashboard.html"; // 👈 Redirection ici !
-		})
-		.catch((error) => {
-			alert("Erreur : " + error.message);
-		});
-
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email,
+      password: mdp
     });
-  } else {
-    console.warn("Formulaire de connexion introuvable !");
-  }
-});
 
+    if (error) {
+      alert("Erreur de connexion : " + error.message);
+    } else {
+      // ✅ Connexion réussie
+      alert("Bienvenue dans le cockpit Zilu !");
+      window.location.href = "./dashboard.html";
+    }
+  });
 </script>
 
 <body>
-	<div class="bande-gauche"></div>
-	<div class="bande-droite"></div>
-	<div class="contenu">
-	<form id="connexion">
-  <h2>Connexion</h2>
+  <div class="bande-gauche"></div>
+  <div class="bande-droite"></div>
+  <div class="contenu">
+    <form id="connexion">
+      <h2>Se connecter à Zilu</h2>
 
-  <label for="email-connexion">Email :</label>
-  <input type="email" id="email-connexion" name="email" required>
+      <label for="email">Email :</label>
+      <input type="email" id="email" name="email" required>
 
-  <label for="mdp-connexion">Mot de passe :</label>
-  <input type="password" id="mdp-connexion" name="motdepasse" required>
+      <label for="motdepasse">Mot de passe :</label>
+      <input type="password" id="motdepasse" name="motdepasse" required>
 
-  <button type="submit">Se connecter</button>
-</form>
-
-	
-	
-	
-	
-	
-	</div>
+      <button type="submit">Connexion</button>
+    </form>
+  </div>
 </body>
 </html>
