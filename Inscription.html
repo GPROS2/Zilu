@@ -30,7 +30,7 @@
 
   <script type="module">
     // ✅ Initialisation Supabase
-    const supabase = supabase.createClient(
+    const client = supabase.createClient(
       "https://cidcezkgwrtgevjcvkao.supabase.co", // ← Ton URL
       "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."      // ← Ta clé anon
     );
@@ -42,7 +42,7 @@
       const email = document.getElementById("email").value;
       const mdp = document.getElementById("motdepasse").value;
 
-      const { data, error } = await supabase.auth.signUp({
+      const { data, error } = await client.auth.signUp({
         email,
         password: mdp,
         options: {
