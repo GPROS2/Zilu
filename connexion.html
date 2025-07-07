@@ -34,26 +34,20 @@
       const email = document.getElementById("email-connexion").value;
       const mdp = document.getElementById("mdp-connexion").value;
 
-      signInWithEmailAndPassword(auth, email, mdp)
-        .then((userCredential) => {
-          alert("Connexion réussie !");
-        })
-        .catch((error) => {
-          alert("Erreur : " + error.message);
-        });
+     signInWithEmailAndPassword(auth, email, mdp)
+		.then((userCredential) => {
+			alert("Connexion réussie !");
+			window.location.href = "dashboard.html"; // 👈 Redirection ici !
+		})
+		.catch((error) => {
+			alert("Erreur : " + error.message);
+		});
+
     });
   } else {
     console.warn("Formulaire de connexion introuvable !");
   }
 });
-signInWithEmailAndPassword(auth, email, mdp)
-  .then((userCredential) => {
-    // Connexion OK
-    window.location.href = "dashboard.html"; // Redirige vers la page membre
-  })
-  .catch((error) => {
-    alert("Erreur : " + error.message);
-  });
 
 </script>
 
