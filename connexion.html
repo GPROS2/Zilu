@@ -46,6 +46,14 @@
     console.warn("Formulaire de connexion introuvable !");
   }
 });
+signInWithEmailAndPassword(auth, email, mdp)
+  .then((userCredential) => {
+    // Connexion OK
+    window.location.href = "dashboard.html"; // Redirige vers la page membre
+  })
+  .catch((error) => {
+    alert("Erreur : " + error.message);
+  });
 
 </script>
 

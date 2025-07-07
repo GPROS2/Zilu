@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Zilu – Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style-dashboard.css">
+  <style>
+    body {
+      font-family: sans-serif;
+      padding: 20px;
+      background-color: #f5f5f5;
+    }
+
+    .stockage-container {
+      max-width: 400px;
+      margin: 40px auto;
+      text-align: center;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .barre-externe {
+      width: 100%;
+      height: 20px;
+      background-color: #eee;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 10px;
+    }
+
+    #barre-interne {
+      height: 100%;
+      width: 0%;
+      background-color: #4CAF50;
+      transition: width 0.5s ease;
+    }
+
+    .alerte-invisible { display: none; }
+    .alerte-visible {
+      display: block;
+      color: orange;
+      font-weight: bold;
+      margin-top: 10px;
+      animation: clignote 1s infinite;
+    }
+
+    @keyframes clignote {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    .import-zone {
+      margin-top: 30px;
+      text-align: center;
+    }
+
+    #upload-file {
+      margin-bottom: 10px;
+    }
+
+    #upload-status {
+      margin-top: 10px;
+      font-size: 0.9em;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="stockage-container">
+    <h2>Tableau de bord Zilu</h2>
+    <p>Stockage utilisé : <span id="utilisation">0</span> / 300 Mo</p>
+    <div class="barre-externe">
+      <div id="barre-interne"></div>
+    </div>
+    <p id="alerte" class="alerte-invisible">⚠️ Attention : stockage presque plein !</p>
+  </div>
+
+  <div class="import-zone">
+    <input type="file" id="upload-file" />
+    <br>
+    <button id="envoyer-fichier">Importer vers Firebase</button>
+    <p id="upload-status"></p>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
+    import { getStorage, ref, listAll, getMetadata, uploadBytes } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-storage.js";
+
+    // 🔑 Config Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDS31w_jJbABou5_0M-CIXb8lwSDz6v9kk",
+      authDomain: "insription-zilu.firebaseapp.com",
+      projectId: "insription-zilu",
+      storageBucket: "insription-zilu.appspot.com",
+      messagingSenderId: "779556803914",
+      appId: "1:779556803914:web:94bb1e09576cad20f11db3",
+      measurementId: "G-9YV1TK4QJW"
+    };
+
+    // 🚀 Init
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const storage = getStorage(app);
+
+    // 📊 Barre de stockage
+    function updateBarre(tailleMo) {
+      const totalMo = 300;
+      const utilisation = document.getElementById("utilisation");
+      const barre = document.getElementById("barre-interne");
+      const alerte = document.getElementById("alerte");
+
+      const pourcentage = Math.floor((tailleMo / totalMo) * 100);
+      utilisation.textContent = `${tailleMo.toFixed(2)} Mo`;
+      barre.style.width = `${pourcentage}%`;
+
+      if (pourcentage >= 90) {
+        barre.style.backgroundColor = "red";
+        alerte.textContent = "❌ Stockage plein ! Supprime ou archive un fichier.";
+        alerte.classList.replace("alerte-invisible", "alerte-visible");
+      } else if (pourcentage >= 80) {
+        barre.style.backgroundColor = "orange";
+        alerte.classList.replace("alerte-invisible", "alerte-visible");
+      } else {
+        barre.style.backgroundColor = "#4CAF50";
+        alerte.classList.replace("alerte-visible", "alerte-invisible");
+      }
+    }
+
+    // 🧮 Calcul du stockage
+    function calculerStockage(uid) {
+      const dossier = ref(storage, `fichiers/${uid}`);
+      listAll(dossier).then((res) => {
+        let tailleTotale = 0;
+        const promesses = res.items.map((item) =>
+          getMetadata(item).then((meta) => {
+            tailleTotale += meta.size / (1024 * 1024); // octets → Mo
+          })
+        );
+        Promise.all(promesses).then(() => {
+          updateBarre(tailleTotale);
+        });
+      }).catch((err) => {
+        console.error("Erreur lecture dossier Firebase :", err);
+      });
+    }
+
+    // 📁 Import de fichier
+    const boutonUpload = document.getElementById("envoyer-fichier");
+    const inputFichier = document.getElementById("upload-file");
+    const statut = document.getElementById("upload-status");
+
+    let utilisateurConnecté = null;
+
+    boutonUpload.addEventListener("click", () => {
+      const fichier = inputFichier.files[0];
+      const user = utilisateurConnecté;
+
+      if (fichier && user) {
+        const chemin = `fichiers/${user.uid}/${fichier.name}`;
+        const refFichier = ref(storage, chemin);
+
+        uploadBytes(refFichier, fichier).then(() => {
+          statut.textContent = `✅ Fichier "${fichier.name}" importé !`;
+          calculerStockage(user.uid); // 🔄 Mise à jour après upload
+        }).catch((error) => {
+          statut.textContent = `❌ Erreur d'upload : ${error.message}`;
+        });
+      } else {
+        statut.textContent = "⚠️ Aucun fichier sélectionné ou utilisateur non connecté.";
+      }
+    });
+
+    // 🔐 Auth utilisateur
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        utilisateurConnecté = user;
+        calculerStockage(user.uid);
+      } else {
+        window.location.href = "connexion.html";
+      }
+    });
+  </script>
+</body>
+</html>
