@@ -1,0 +1,36 @@
+form {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #0F056B;
+  color: #318CE7;
+  border-radius: 8px;
+  box-shadow: 0 0 10px #000;
+}
+
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  border: none;
+  border-radius: 4px;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px;
+  background-color: #318CE7;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #2567b0;
+}
