@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Zilu – Inscription</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style-connexion.css"> <!-- extension en minuscules -->
+  <link rel="stylesheet" href="style-connexion.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 
@@ -29,32 +29,40 @@
   </div>
 
   <script type="module">
-    // ✅ Initialisation Supabase
-    const client = supabase.createClient(
-      "https://cidcezkgwrtgevjcvkao.supabase.co", // ← Ton URL
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."      // ← Ta clé anon
-    );
+    window.addEventListener("DOMContentLoaded", () => {
+      const client = supabase.createClient(
+        "https://cidcezkgwrtgevjcvkao.supabase.co",
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..." // ta vraie clé ici
+      );
 
-    // ✅ Écoute du formulaire
-    document.getElementById("inscription").addEventListener("submit", async (e) => {
-      e.preventDefault();
+      const form = document.getElementById("inscription");
 
-      const email = document.getElementById("email").value;
-      const mdp = document.getElementById("motdepasse").value;
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
 
-      const { data, error } = await client.auth.signUp({
-        email,
-        password: mdp,
-        options: {
-          redirectTo: "https://gpros2.github.io/Zilu/dashboard.html" // ← Modifie si besoin
+        const email = document.getElementById("email").value;
+        const mdp = document.getElementById("motdepasse").value;
+        const pseudo = document.getElementById("pseudo").value;
+
+        if (!pseudo || !email || !mdp) {
+          alert("⚠️ Tous les champs sont obligatoires !");
+          return;
+        }
+
+        const { data, error } = await client.auth.signUp({
+          email,
+          password: mdp,
+          options: {
+            redirectTo: "https://gpros2.github.io/Zilu/dashboard.html"
+          }
+        });
+
+        if (error) {
+          alert("❌ Erreur : " + error.message);
+        } else {
+          alert("✅ Compte créé avec succès ! Vérifie ton email 📩");
         }
       });
-
-      if (error) {
-        alert("❌ Erreur : " + error.message);
-      } else {
-        alert("✅ Compte créé avec succès ! Vérifie ton email 📩");
-      }
     });
   </script>
 </body>
