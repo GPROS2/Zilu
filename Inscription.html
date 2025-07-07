@@ -28,42 +28,30 @@
     </form>
   </div>
 
-  <script type="module">
-    window.addEventListener("DOMContentLoaded", () => {
-      const client = supabase.createClient(
-        "https://cidcezkgwrtgevjcvkao.supabase.co",
-        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ" 
-      );
+ <script type="module">
+  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-      const form = document.getElementById("inscription");
+  const supabase = createClient(
+    'https://cidcezkgwrtgevjcvkao.supabase.co',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ'
+  )
 
-      form.addEventListener("submit", async (e) => {
-        e.preventDefault();
+  document.getElementById("inscription").addEventListener("submit", async (e) => {
+    e.preventDefault()
+    const email = document.getElementById("email").value
+    const mdp = document.getElementById("motdepasse").value
 
-        const email = document.getElementById("email").value;
-        const mdp = document.getElementById("motdepasse").value;
-        const pseudo = document.getElementById("pseudo").value;
+    const { error } = await supabase.auth.signUp({
+      email,
+      password: mdp,
+      options: {
+        redirectTo: "https://gpros2.github.io/Zilu/dashboard.html"
+      }
+    })
 
-        if (!pseudo || !email || !mdp) {
-          alert("⚠️ Tous les champs sont obligatoires !");
-          return;
-        }
+    alert(error ? "❌ Erreur : " + error.message : "✅ Inscription réussie, vérifie ton email 📩")
+  })
+</script>
 
-        const { data, error } = await client.auth.signUp({
-          email,
-          password: mdp,
-          options: {
-            redirectTo: "https://gpros2.github.io/Zilu/dashboard.html"
-          }
-        });
-
-        if (error) {
-          alert("❌ Erreur : " + error.message);
-        } else {
-          alert("✅ Compte créé avec succès ! Vérifie ton email 📩");
-        }
-      });
-    });
-  </script>
 </body>
 </html>
