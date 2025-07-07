@@ -1,61 +1,59 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>Zilu-inscription</title>
-    <link rel="stylesheet" href="style-connexion.CSS"> <!-- nom corrigé -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- 👉 SDK Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <meta charset="UTF-8">
+  <title>Zilu – Inscription</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style-connexion.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 
-
-
 <body>
-    <div class="bande-gauche"></div>
-    <div class="bande-droite"></div>
-    <div class="contenu">
+  <div class="bande-gauche"></div>
+  <div class="bande-droite"></div>
+  <div class="contenu">
     <form id="inscription">
-    <h2>Créer un compte Zilu</h2>
+      <h2>Créer un compte Zilu</h2>
 
-    <label for="pseudo">Pseudo :</label>
-    <input type="text" id="pseudo" name="pseudo" required>
+      <label for="pseudo">Pseudo :</label>
+      <input type="text" id="pseudo" name="pseudo" required>
 
-    <label for="email">Email :</label>
-    <input type="email" id="email" name="email" required>
+      <label for="email">Email :</label>
+      <input type="email" id="email" name="email" required>
 
-    <label for="motdepasse">Mot de passe :</label>
-    <input type="password" id="motdepasse" name="motdepasse" required>
+      <label for="motdepasse">Mot de passe :</label>
+      <input type="password" id="motdepasse" name="motdepasse" required>
 
-    <button type="submit">S'inscrire</button>
+      <button type="submit">S'inscrire</button>
     </form>
-    </div>
-	
-	<script type="module">
-  // 👉 1. INIT SUPABASE
-  const supabaseUrl = 'https://cidcezkgwrtgevjcvkao.supabase.co'; // Remplace avec ton URL
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ'; // à retrouver dans Supabase > Project Settings > API
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+  </div>
 
-  // 👉 2. FORMULAIRE D’INSCRIPTION
-  document.getElementById("inscription").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const email = document.getElementById("email").value;
-    const mdp = document.getElementById("motdepasse").value;
+  <script type="module">
+    const supabase = supabase.createClient(
+      "https://cidcezkgwrtgevjcvkao.supabase.co", // ✅ Ton URL
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ"
+    );
 
-    // 🚀 Inscription avec Supabase Auth
-    const { data, error } = await supabase.auth.signUp({
-      email: email,
-      password: mdp
+    document.getElementById("inscription").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const mdp = document.getElementById("motdepasse").value;
+
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password: mdp,
+        options: {
+          redirectTo: "https://gpros2.github.io/Zilu/dashboard.html"
+        }
+      });
+
+      if (error) {
+        alert("❌ Erreur : " + error.message);
+      } else {
+        alert("✅ Compte créé avec succès ! Vérifie ton email 📩");
+      }
     });
-
-    if (error) {
-      alert("Erreur : " + error.message);
-    } else {
-      alert("Compte créé avec succès ! Vérifie tes emails 📩");
-    }
-  });
-</script>
+  </script>
 </body>
-
-
 </html>
