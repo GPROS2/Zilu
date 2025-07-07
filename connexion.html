@@ -37,6 +37,7 @@
      signInWithEmailAndPassword(auth, email, mdp)
 		.then((userCredential) => {
 			alert("Connexion réussie !");
+			console.log("Redirection vers dashboard.html...");
 			window.location.href = "dashboard.html"; // 👈 Redirection ici !
 		})
 		.catch((error) => {
