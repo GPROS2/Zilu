@@ -1,14 +1,11 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
+  <meta charset="UTF-8">
   <title>Zilu – Connexion</title>
-  <link rel="stylesheet" href="style-connexion.CSS">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- 👉 SDK Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <link rel="stylesheet" href="style-connexion.css"> <!-- ⬅️ corrigé -->
 </head>
-
-
 
 <body>
   <div class="bande-gauche"></div>
@@ -26,34 +23,35 @@
       <button type="submit">Connexion</button>
     </form>
   </div>
+
   <script type="module">
-  // 👉 1. INIT Supabase
-  const supabaseUrl = 'https://cidcezkgwrtgevjcvkao.supabase.co'; // ✅ ton URL
-  const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ';
-  const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-  // 👉 2. Connexion utilisateur
-  document.getElementById("connexion").addEventListener("submit", async (e) => {
-    e.preventDefault();
+    window.addEventListener("DOMContentLoaded", () => {
+      const supabase = createClient(
+        'https://cidcezkgwrtgevjcvkao.supabase.co',
+        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNpZGNlemtnd3J0Z2V2amN2a2FvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTE4OTU2NzUsImV4cCI6MjA2NzQ3MTY3NX0.DlmA9BI6nRQ15DeCBxVEE2ZUek2iLVQDvxHrgQ8hAyQ'
+      )
 
-    const email = document.getElementById("email").value;
-    const mdp = document.getElementById("motdepasse").value;
+      document.getElementById("connexion").addEventListener("submit", async (e) => {
+        e.preventDefault()
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email,
-      password: mdp
-    });
+        const email = document.getElementById("email").value
+        const mdp = document.getElementById("motdepasse").value
 
-    if (error) {
-      alert("Erreur de connexion : " + error.message);
-    } else {
-      // ✅ Connexion réussie
-      alert("Bienvenue dans le cockpit Zilu !");
-      window.location.href = "./dashboard.html";
-    }
-  });
-</script>
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password: mdp
+        })
+
+        if (error) {
+          alert("❌ Erreur de connexion : " + error.message)
+        } else {
+          alert("✅ Bienvenue dans le cockpit Zilu !")
+          window.location.href = "./dashboard.html"
+        }
+      })
+    })
+  </script>
 </body>
-
-
 </html>
